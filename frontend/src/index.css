@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+/* Custom variables and theme colors */
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color-scheme: dark light;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #0d0d0d;
+  color: #f3f4f6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #121212;
+}
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* Page Break settings for ATS compatibility */
+.page-break {
+  page-break-before: always;
+}
+
+/* Ensure bullet lists always render markers inside resume templates.
+   Tailwind v4 base layer resets list-style to none — this overrides that. */
+.print-area ul {
+  list-style-type: disc !important;
+  list-style-position: outside !important;
+  padding-left: 1.2em !important;
+}
+.print-area ul li {
+  display: list-item !important;
+}
+
+/* Printing logic */
+@media print {
+  html, body {
+    height: auto !important;
+    background: white !important;
+    color: black !important;
+    font-size: 11pt !important;
+  }
+
+  /* Hide editing layout, panels, navbar, buttons */
+  .no-print,
+  header,
+  nav {
+    display: none !important;
+  }
+
+  /* Expand print area to full page width with internal padding */
+  .print-area {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 20mm !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  @page {
+    size: A4;
+    /* Zero margin removes browser's auto-added headers (URL, title, date, page numbers) */
+    margin: 0;
+  }
+
+  /* Keep headings and lists from breaking across pages awkwardly */
+  h1, h2, h3, h4, h5 {
+    page-break-after: avoid;
+  }
+  
+  .resume-section {
+    page-break-inside: avoid;
+  }
+}
