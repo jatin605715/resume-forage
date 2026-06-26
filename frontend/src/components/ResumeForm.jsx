@@ -61,6 +61,7 @@ function AIAssistant({ type, text, onApply }) {
         ];
       case 'project':
         return [
+          { label: '✨ Suggest Bullets', promptType: 'bullets' },
           { label: '✨ Improve Description', promptType: 'improve' },
           { label: '✨ Highlight Tech', promptType: 'tech' }
         ];

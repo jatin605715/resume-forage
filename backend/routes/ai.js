@@ -30,7 +30,9 @@ function getPrompt(type, text, promptType) {
       }
       break;
     case 'project':
-      if (promptType === 'tech') {
+      if (promptType === 'bullets') {
+        prompt = `You are a professional resume writer. Convert the following project description into 3-4 professional, action-oriented bullet points. Start each bullet point with a strong action verb (e.g., Developed, Optimized, Built, Implemented). Do not use placeholders. Return ONLY the bullet points, each on a new line starting with "• ". Do not include conversational text, greetings, headers, or quotes.\n\nProject description:\n"${cleanText}"`;
+      } else if (promptType === 'tech') {
         prompt = `You are a professional resume writer. Enhance this project description to emphasize technical implementation, architecture, and tools used. Make it sound highly technical and structured. Return ONLY the enhanced description. Do not include conversational text, greetings, or quotes.\n\nProject description:\n"${cleanText}"`;
       } else {
         prompt = `You are a professional resume writer. Enhance this project description to highlight achievements, metrics, and key features. Return ONLY the enhanced description. Do not include conversational text, greetings, or quotes.\n\nProject description:\n"${cleanText}"`;
@@ -40,6 +42,55 @@ function getPrompt(type, text, promptType) {
       prompt = `You are a professional resume writer. Improve this text to be more appropriate for a professional resume: "${cleanText}". Return ONLY the improved text. Do not include conversational text, greetings, or quotes.`;
   }
   return prompt;
+}
+function cleanBulletPoints(rawText) {
+  const lines = rawText.split('\n');
+  const cleanedLines = [];
+
+  const conversationalPhrases = [
+    'here is', 'here are', 'sure,', 'okay,', 'sure!', 'hope this helps',
+    'let me know', 'would you like', 'to make this', 'tailored to',
+    'i can', 'you can', 'feel free', 'designed to', 'aims to'
+  ];
+
+  const pronouns = ['i', 'we', 'you', 'he', 'she', 'they', 'it'];
+
+  for (let line of lines) {
+    let cleaned = line.trim();
+    if (!cleaned) continue;
+
+    // Remove leading bullets (*, -, •, +, etc.) and numbers (1., 1), etc.)
+    cleaned = cleaned.replace(/^([*•\-+]+|\d+[.)])\s*/, '').trim();
+
+    // Strip wrapping markdown asterisks or bold/italic indicators
+    cleaned = cleaned.replace(/\*\*/g, '');
+    cleaned = cleaned.replace(/\*/g, '');
+    cleaned = cleaned.trim();
+
+    const lowerCleaned = cleaned.toLowerCase();
+    
+    // Skip if it ends with question mark or colons with few words
+    if (cleaned.endsWith('?') || (cleaned.endsWith(':') && cleaned.split(' ').length < 5)) {
+      continue;
+    }
+
+    // Skip if it starts with any conversational phrases
+    if (conversationalPhrases.some(phrase => lowerCleaned.startsWith(phrase) || lowerCleaned.includes(phrase))) {
+      continue;
+    }
+
+    // Skip if the first word is a personal pronoun
+    const firstWord = lowerCleaned.split(' ')[0];
+    if (pronouns.includes(firstWord)) {
+      continue;
+    }
+
+    if (cleaned.length > 5) {
+      cleanedLines.push(`• ${cleaned}`);
+    }
+  }
+
+  return cleanedLines.join('\n');
 }
 
 // POST /api/ai/suggest
@@ -92,7 +143,12 @@ router.post('/suggest', async (req, res) => {
       generatedText = generatedText.substring(1, generatedText.length - 1);
     }
 
-    res.json({ suggestion: generatedText.trim() });
+    let suggestion = generatedText.trim();
+    if (promptType === 'bullets') {
+      suggestion = cleanBulletPoints(suggestion);
+    }
+
+    res.json({ suggestion });
   } catch (error) {
     console.error('Ollama communication error:', error);
     
