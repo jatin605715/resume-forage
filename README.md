@@ -25,9 +25,18 @@ resumeForage/
 ## Setup Instructions
 
 ### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) installed (v16+ recommended).
+* **Node.js**: Make sure you have [Node.js](https://nodejs.org/) installed (v16+ recommended).
+* **Ollama**: To power the local AI features (resume polishing & ATS suggestions), download and install [Ollama](https://ollama.com/).
 
-### 1. Run the Backend Server
+### 1. Run Ollama (Local AI Engine)
+1. Ensure Ollama is installed and running on your system.
+2. In your terminal, pull and start the model (the default model is `llama3`):
+   ```bash
+   ollama run llama3
+   ```
+   *(Note: Keep this process/terminal running. Ollama will run by default on `http://localhost:11434`)*
+
+### 2. Run the Backend Server
 1. Navigate to the backend directory:
    ```bash
    cd backend
@@ -38,10 +47,12 @@ Make sure you have [Node.js](https://nodejs.org/) installed (v16+ recommended).
    ```
 3. Initialize the environment variables:
    * A default `.env` file has already been created for you with default configurations.
-   * Customize ports or secret key in `.env` if desired:
+   * Customize ports, secret key, or Ollama settings in `.env` if desired:
      ```env
      PORT=5000
      JWT_SECRET=super_secret_resume_forge_jwt_key_12345!
+     OLLAMA_HOST=http://localhost:11434
+     OLLAMA_MODEL=llama3
      ```
 4. Start the server:
    ```bash
@@ -50,7 +61,7 @@ Make sure you have [Node.js](https://nodejs.org/) installed (v16+ recommended).
    * The server runs on `http://localhost:5000`
    * The SQLite database file will automatically initialize at `backend/database.sqlite`
 
-### 2. Run the Frontend Client
+### 3. Run the Frontend Client
 1. Open a new terminal window and navigate to the frontend directory:
    ```bash
    cd frontend
@@ -87,3 +98,7 @@ Includes 3 professional templates:
 * The **Download PDF** button triggers the browser's high-quality print engine.
 * Our `@media print` rules hide the editing interface, toolbars, and dashboard layout, rendering only the clean, black-and-white A4 layout.
 * **Why this is critical for ATS**: Converting HTML to an image first (like `html2canvas` + `jspdf`) destroys the text layer, making the resume completely unreadable by ATS parsers. Browser printing preserves raw searchable text, fonts, and clean layout structures, guaranteeing 100% ATS compatibility.
+
+### 4. Local AI Assistance (Ollama)
+* **AI suggestion & polishing**: Shorten or rewrite your professional summary, job experience description, or project details on-the-fly. Choose between technical focus, concise/shortened sentences, or formal/polished styles.
+* **ATS Keyword Suggested Helper**: Analyze your entire resume context, work history, and target role to generate 12 highly relevant and missing skill keywords that help pass automatic recruiter filters.
